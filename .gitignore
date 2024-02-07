@@ -50,3 +50,7 @@ nbdist/
 .nb-gradle/
 
 .DS_Store
+
+# Terraform
+.terraform/
+*.tfstate*

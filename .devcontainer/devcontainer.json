@@ -1,0 +1,44 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
+{
+    "name": "Migrate JBOSS to App Service",
+    // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+    "dockerComposeFile": [
+        "./docker-compose.yml"
+    ],
+    "service": "jboss",
+    "workspaceFolder": "/workspace",
+    "shutdownAction": "stopCompose",
+    "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2.8.0": {
+            "version": "latest"
+        },
+        "ghcr.io/devcontainers/features/azure-cli:1": {},
+        "ghcr.io/devcontainers/features/java:1": {
+            "version": "none",
+            "installGradle": "true",
+            "installMaven": "true"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "GitHub.copilot",
+                "GitHub.copilot-chat",
+                "ms-azuretools.vscode-docker",
+                "vscjava.vscode-java-pack",
+                "ritwickdey.LiveServer"
+            ]
+        }
+    },
+    "postCreateCommand": "mvn -fn dependency:resolve-plugins dependency:resolve dependency:go-offline clean compile package; $JBOSS_HOME/bin/standalone.sh -b 0.0.0.0"
+    // Features to add to the dev container. More info: https://containers.dev/features.
+    // "features": {},
+    // Use 'forwardPorts' to make a list of ports inside the container available locally.
+    // "forwardPorts": [5000, 5001],
+    // "portsAttributes": {
+    //		"5001": {
+    //			"protocol": "https"
+    //		}
+    // }
+}

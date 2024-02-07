@@ -1,0 +1,36 @@
+name: build 
+
+on:
+  push:
+    branches:
+      - app-service
+    tags:
+      - v*
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+   
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the repo
+      uses: actions/checkout@v2
+
+    - name: Set up Java 11
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'microsoft' # See 'Supported distributions' for available options
+        java-version: '11'
+
+    - name: Build application and run tests
+      run: mvn clean install
+
+    - name: Upload artifact for deployment jobs
+      uses: actions/upload-artifact@v2
+      with:
+        name: app
+        path: target/ROOT.war
+        if-no-files-found: error

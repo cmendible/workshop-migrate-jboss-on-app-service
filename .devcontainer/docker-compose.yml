@@ -1,0 +1,15 @@
+services:
+  jboss:
+    build: .
+    volumes:
+      - ..:/workspace:cached
+    command: /bin/sh -c "while sleep 1000; do :; done"
+  database:
+    image: 'postgres:latest'
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: coolstore
+      POSTGRES_PASSWORD: coolstore123
+      POSTGRES_HOST_AUTH_METHOD: md5
+      POSTGRES_DB: monolith

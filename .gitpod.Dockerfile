@@ -55,7 +55,7 @@ ENV LAUNCH_JBOSS_IN_BACKGROUND true
 RUN mkdir -p ${JBOSS_HOME}
 
 RUN wget -O /tmp/postgresql.jar https://jdbc.postgresql.org/download/postgresql-42.2.24.jar
-COPY ./setup /tmp/
+COPY ./devcontainer/setup /tmp/
 ENV SETUP_DIR=/tmp
 
 RUN cd $HOME \
