@@ -27,7 +27,9 @@
                 "GitHub.copilot-chat",
                 "ms-azuretools.vscode-docker",
                 "vscjava.vscode-java-pack",
-                "ritwickdey.LiveServer"
+                "ritwickdey.LiveServer",
+                "ms-azuretools.vscode-azureterraform",
+                "hashicorp.terraform"
             ]
         }
     },
