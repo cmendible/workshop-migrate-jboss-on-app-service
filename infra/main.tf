@@ -52,10 +52,25 @@ resource "azurerm_postgresql_firewall_rule" "host" {
   end_ip_address      = "0.0.0.0"
 }
 
-# Create the Azure Function plan (Elastic Premium) 
+resource "azurerm_log_analytics_workspace" "logs" {
+  name                = "log-eap"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+}
+
+resource "azurerm_application_insights" "appinsights" {
+  name                = "appi-eap"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  workspace_id        = azurerm_log_analytics_workspace.logs.id
+  application_type    = "web"
+}
+
 resource "azurerm_service_plan" "plan" {
   name                = "asp-${var.app_service_name}"
-  location            = var.location
+  location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   os_type             = "Linux"
   sku_name            = "P1v3"
@@ -85,5 +100,37 @@ resource "azurerm_linux_web_app" "eap" {
     POSTGRES_CONNECTION_URL         = "jdbc:postgresql://${azurerm_postgresql_server.server.fqdn}:5432/monolith?sslmode=require"
     POSTGRES_SERVER_ADMIN_FULL_NAME = "azureadmin@${var.postgresql_name}"
     POSTGRES_SERVER_ADMIN_PASSWORD  = random_password.password.result
+
+    "APPINSIGHTS_INSTRUMENTATIONKEY"                  = azurerm_application_insights.appinsights.instrumentation_key
+    "APPINSIGHTS_PROFILERFEATURE_VERSION"             = "1.0.0"
+    "APPINSIGHTS_SNAPSHOTFEATURE_VERSION"             = "1.0.0"
+    "APPLICATIONINSIGHTS_CONFIGURATION_CONTENT"       = ""
+    "APPLICATIONINSIGHTS_CONNECTION_STRING"           = azurerm_application_insights.appinsights.connection_string
+    "ApplicationInsightsAgent_EXTENSION_VERSION"      = "~3"
+    "DiagnosticServices_EXTENSION_VERSION"            = "~3"
+    "InstrumentationEngine_EXTENSION_VERSION"         = "disabled"
+    "SnapshotDebugger_EXTENSION_VERSION"              = "disabled"
+    "XDT_MicrosoftApplicationInsights_BaseExtensions" = "disabled"
+    "XDT_MicrosoftApplicationInsights_Mode"           = "recommended"
+    "XDT_MicrosoftApplicationInsights_PreemptSdk"     = "disabled"
+  }
+
+  sticky_settings {
+    app_setting_names = [
+      "APPINSIGHTS_INSTRUMENTATIONKEY",
+      "APPLICATIONINSIGHTS_CONNECTION_STRING ",
+      "APPINSIGHTS_PROFILERFEATURE_VERSION",
+      "APPINSIGHTS_SNAPSHOTFEATURE_VERSION",
+      "ApplicationInsightsAgent_EXTENSION_VERSION",
+      "XDT_MicrosoftApplicationInsights_BaseExtensions",
+      "DiagnosticServices_EXTENSION_VERSION",
+      "InstrumentationEngine_EXTENSION_VERSION",
+      "SnapshotDebugger_EXTENSION_VERSION",
+      "XDT_MicrosoftApplicationInsights_Mode",
+      "XDT_MicrosoftApplicationInsights_PreemptSdk",
+      "APPLICATIONINSIGHTS_CONFIGURATION_CONTENT",
+      "XDT_MicrosoftApplicationInsightsJava",
+      "XDT_MicrosoftApplicationInsights_NodeJS",
+    ]
   }
 }
