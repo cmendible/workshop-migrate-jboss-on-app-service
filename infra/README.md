@@ -1,4 +1,11 @@
-## Using MTA to analyze the  application
+## Using MTA to analyze the application
+
+To install podman run the fllowing commands:
+
+```bash
+apt-get update
+apt-get -y install podman
+```
 
 Run the following commands to analyze the application using MTA:
 
